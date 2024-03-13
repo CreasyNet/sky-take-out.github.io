@@ -14,6 +14,7 @@ import com.sky.utils.JwtUtil;
 import com.sky.vo.EmployeeLoginVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +45,7 @@ public class EmployeeController {
     @PostMapping("/login")
     @ApiOperation(value = "员工登录")
     public Result<EmployeeLoginVO> login(@RequestBody EmployeeLoginDTO employeeLoginDTO) {
-        log.info("员工登录：{}", employeeLoginDTO);
+        log.info("员工登录：{}",employeeLoginDTO);
 
         Employee employee = employeeService.login(employeeLoginDTO);
 
@@ -104,4 +105,17 @@ public class EmployeeController {
          return Result.success(pageResult);
     }
 
+    /**
+     * 启用或者禁用员工账号
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("启用禁用员工账号")
+    public Result updateStatus(@PathVariable Integer status,Long id){
+        log.info("修改启用禁用状态和用户:{},{}",status,id);
+        employeeService.statusStartOrStop(status,id);
+        return Result.success();
+    }
 }
