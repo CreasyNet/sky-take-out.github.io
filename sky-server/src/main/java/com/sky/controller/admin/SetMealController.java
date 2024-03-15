@@ -37,7 +37,7 @@ public class SetMealController {
 
     /**
      * 根据分类id查询菜品
-     * @param id
+     * @param
      * @return
      */
     @GetMapping("/list")
