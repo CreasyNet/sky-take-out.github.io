@@ -49,10 +49,7 @@ public class AutoFiiAspect {
 
         //通过反射填充字段
         if (type.equals(OperationType.INSERT)){
-            /*employee.setCreateUser(idUpdaterOrCreater);
-            employee.setUpdateUser(idUpdaterOrCreater);
-            employee.setCreateTime(LocalDateTime.now());
-            employee.setUpdateTime(LocalDateTime.now());*/
+
             try {
                 //通过反射设置对象的属性
                 Method setCreateTime = obj.getClass().getMethod(AutoFillConstant.SET_CREATE_TIME, LocalDateTime.class);
