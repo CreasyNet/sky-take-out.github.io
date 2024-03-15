@@ -96,9 +96,48 @@ public class DishServiceImpl implements DishService {
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
         }
 
-        for (Long id : ids) {
+       /* for (Long id : ids) {
             dishMapper.delete(id);
             dishFlavorMapper.delete(id);
+        }*/
+        dishMapper.deleteByIds(ids);
+        dishFlavorMapper.deleteByIds(ids);
+    }
+
+    /**
+     * 查询回显
+     * @param id
+     * @return
+     */
+    public DishVO getById(Long id) {
+        Dish dish = dishMapper.queryById(id);
+
+        List<DishFlavor> flavors = dishFlavorMapper.getByDishId(id);
+        DishVO dishVO = new DishVO();
+
+        BeanUtils.copyProperties(dish,dishVO);
+        dishVO.setFlavors(flavors);
+        return dishVO;
+    }
+
+    /**
+     * 修改菜品
+     * @param dishDTO
+     */
+    public void updateByIdWithFlavor(DishDTO dishDTO) {
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO,dish);
+        dishMapper.updateById(dish);
+
+        //修改口位值，先删除再插入
+        dishFlavorMapper.delete(dishDTO.getId());
+        List<DishFlavor> flavors = dishDTO.getFlavors();
+
+        if (flavors !=null && flavors.size()>0){
+            flavors.forEach(dishFlavor -> {
+                dishFlavor.setDishId(dishDTO.getId());
+            });
+            dishFlavorMapper.insert(flavors);
         }
     }
 }
