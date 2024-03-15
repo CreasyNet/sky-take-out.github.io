@@ -2,12 +2,16 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -28,6 +32,9 @@ public class DishServiceImpl implements DishService {
 
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
+
+    @Autowired
+    private SetmealDishMapper setmealDishMapper;
     /**
      * 新增菜品
      * @param dishDTO
@@ -62,5 +69,36 @@ public class DishServiceImpl implements DishService {
 
         Page<DishVO> dishVOS = dishMapper.pageQuery(dishPageQueryDTO);
         return new PageResult(dishVOS.getTotal(),dishVOS.getResult());
+    }
+
+
+    /**
+     * 批量删除菜品
+     * @param ids
+     */
+    public void deleteWithDishflavor(List<Long> ids) {
+        /*
+        - 在dish表中删除菜品基本数据时，同时，也要把关联在dish_flavor表中的数据一块删除。
+        - setmeal_dish表为菜品和套餐关联的中间表。
+        - 若删除的菜品数据关联着某个套餐，此时，删除失败。
+        - 若要删除套餐关联的菜品数据，先解除两者关联，再对菜品进行删除。
+         */
+        //起售中的菜品是不能删除的
+        for (Long id : ids) {
+            Dish dish = dishMapper.queryById(id);
+            if (dish.getStatus() == StatusConstant.ENABLE){
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            }
+        }
+
+        List<Long> setMealIds = setmealDishMapper.queryByDishId(ids);
+        if (setMealIds != null && setMealIds.size()>0){
+            throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+        }
+
+        for (Long id : ids) {
+            dishMapper.delete(id);
+            dishFlavorMapper.delete(id);
+        }
     }
 }
