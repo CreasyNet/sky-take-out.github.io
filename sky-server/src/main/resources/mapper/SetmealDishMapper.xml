@@ -11,6 +11,7 @@
        </foreach>
     </select>
 
+
     <insert id="insertBySeMealId">
         insert into setmeal_dish (setmeal_id, dish_id, name, price,copies)
         VALUES
@@ -25,4 +26,9 @@
             #{id}
         </foreach>
     </delete>
+
+    <!--根据套餐id查询所有关联的菜品表里的菜品-->
+    <select id="queryDishesById" resultType="com.sky.entity.Dish">
+        select d.* from setmeal_dish sd left join dish d on d.id = sd.dish_id where sd.setmeal_id = #{id};
+    </select>
 </mapper>

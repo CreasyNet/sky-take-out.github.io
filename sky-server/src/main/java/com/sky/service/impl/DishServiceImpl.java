@@ -121,7 +121,7 @@ public class DishServiceImpl implements DishService {
     }
 
     /**
-     * 修改菜品
+     * 编辑菜品
      * @param dishDTO
      */
     public void updateByIdWithFlavor(DishDTO dishDTO) {
@@ -153,5 +153,14 @@ public class DishServiceImpl implements DishService {
                 .status(StatusConstant.ENABLE)
                 .build();
         return dishMapper.list(dish) ;
+    }
+
+    /**
+     * 起售或者禁售菜品
+     * @param status
+     * @param id
+     */
+    public void startOrStop(Integer status, Long id) {
+        dishMapper.updateStatusBid(status,id);
     }
 }

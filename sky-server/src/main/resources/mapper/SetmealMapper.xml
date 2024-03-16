@@ -54,6 +54,9 @@
             <if test="categoryId != null">
                 category_id =#{categoryId},
             </if>
+            <if test="status != null">
+                status = #{status}
+            </if>
         </set>
         where id = #{id}
     </update>
