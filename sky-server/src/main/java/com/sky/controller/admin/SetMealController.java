@@ -9,6 +9,7 @@ import com.sky.service.SetMealService;
 import com.sky.service.impl.DishServiceImpl;
 import com.sky.service.impl.SetMealServiceImpl;
 import com.sky.vo.DishVO;
+import com.sky.vo.SetmealVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +63,32 @@ public class SetMealController {
     public Result delete(@RequestParam List<Long> ids){
         log.info("删除套餐，{}",ids);
         setMealService.deleteWithDish(ids);
+        return Result.success();
+    }
+
+    /**
+     * 根据id查询套餐
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("根据id查询套餐")
+    public Result<SetmealVO> getById(@PathVariable Long id){
+        SetmealVO setmealVO  =  setMealService.getById(id);
+
+        return Result.success(setmealVO);
+    }
+
+    /**
+     * 修改套餐
+     * @param setmealDTO
+     * @return
+     */
+    @PutMapping
+    @ApiOperation("修改套餐")
+    public Result update(@RequestBody SetmealDTO setmealDTO){
+        log.info("修改套餐,{}",setmealDTO);
+        setMealService.updateWithDishes(setmealDTO);
         return Result.success();
     }
 }
