@@ -1,12 +1,17 @@
 package com.sky.mapper;
 
+import com.github.pagehelper.Page;
 import com.sky.annotation.AutoFill;
+import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Setmeal;
 import com.sky.enumeration.OperationType;
+import com.sky.vo.SetmealVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 @Mapper
 public interface SetmealMapper {
@@ -24,8 +29,26 @@ public interface SetmealMapper {
      * @param setmeal
      */
     @AutoFill(value = OperationType.INSERT)
-    @Insert("insert into setmeal (category_id, name, price, description, image,status) " +
-            "VALUES (#{categoryId},#{name},#{price},#{description},#{image},#{status})")
+//
     void insert(Setmeal setmeal);
 
+    /**
+     * 套餐的分页查询
+     * @param setmealPageQueryDTO
+     * @return
+     */
+    Page<SetmealVO> pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
+
+    /**
+     * 根据id返回套餐信息
+     * @return
+     */
+    @Select("select * from setmeal where id = #{id};")
+    Setmeal queryById(Long id);
+
+    /**
+     * 批量删除套餐
+     * @param ids
+     */
+    void delete(List<Long> ids);
 }

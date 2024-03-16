@@ -3,6 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sky.mapper.SetmealDishMapper">
 
+
     <select id="queryByDishId" resultType="java.lang.Long">
         select * from setmeal_dish where dish_id in 
        <foreach collection="dishIds" item="dishId" separator="," open="(" close=")">
@@ -11,11 +12,17 @@
     </select>
 
     <insert id="insertBySeMealId">
-        insert into setmeal_dish (setmeal_id, dish_id, name, price, copies,create_time, update_time, create_user, update_user)
+        insert into setmeal_dish (setmeal_id, dish_id, name, price,copies)
         VALUES
         <foreach collection="dishes" item="ds" separator=",">
-            (#{ds.setmealId},#{ds.dishId},#{ds.name},#{ds.price},#{ds.copies},#{createTime},#{updateTime},
-            #{createUser}, #{updateUser})
+            (#{ds.setmealId},#{ds.dishId},#{ds.name},#{ds.price},#{ds.copies})
         </foreach>
     </insert>
+
+    <delete id="delete">
+        delete from setmeal_dish where setmeal_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>
