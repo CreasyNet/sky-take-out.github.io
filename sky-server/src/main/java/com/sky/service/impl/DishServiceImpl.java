@@ -15,14 +15,14 @@ import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 @Service
@@ -36,6 +36,7 @@ public class DishServiceImpl implements DishService {
 
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+
     /**
      * 新增菜品
      * @param dishDTO
@@ -103,6 +104,7 @@ public class DishServiceImpl implements DishService {
         }*/
         dishMapper.deleteByIds(ids);
         dishFlavorMapper.deleteByIds(ids);
+
     }
 
     /**
@@ -140,6 +142,7 @@ public class DishServiceImpl implements DishService {
             });
             dishFlavorMapper.insert(flavors);
         }
+
     }
 
     /**
@@ -163,6 +166,7 @@ public class DishServiceImpl implements DishService {
      */
     public void startOrStop(Integer status, Long id) {
         dishMapper.updateStatusBid(status,id);
+
     }
 
     /**
