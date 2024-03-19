@@ -112,7 +112,10 @@ public class SetMealServiceImpl implements SetMealService {
         //准备套餐信息和菜品信息
 
         List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
-        //拷贝属性到setmeal对象
+        for (SetmealDish setmealDish : setmealDishes) {
+            setmealDish.setSetmealId(setmealDTO.getId());
+        }
+        //拷贝属性到setmeal对象,更新套餐基本信息
         Setmeal setmeal = new Setmeal();
         BeanUtils.copyProperties(setmealDTO,setmeal);
 

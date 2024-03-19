@@ -1,6 +1,0 @@
-
-aliyun:
-  endpoint: https://oss-cn-shenzhen.aliyuncs.com
-  accessKeyId: LTAI5tQgyiMQoExf7mRbUdML
-  accessKeySecret: txmtRbjgcokgpGR3VeIG96HWVcLbAe
-  bucketName: zcg-123
