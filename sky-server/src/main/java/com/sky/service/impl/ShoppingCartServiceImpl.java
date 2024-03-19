@@ -74,7 +74,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     /**
-     * 查看购物车
+     * 查看当前用户的购物车清单
      * @return
      */
     public List<ShoppingCart> showShoppingCart() {
