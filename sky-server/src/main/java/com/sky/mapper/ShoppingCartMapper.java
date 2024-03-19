@@ -18,7 +18,7 @@ public interface ShoppingCartMapper {
      * @param shoppingCart
      * @return
      */
-    List<ShoppingCart> queryById(ShoppingCart shoppingCart);
+    List<ShoppingCart> query(ShoppingCart shoppingCart);
 
 
     /**

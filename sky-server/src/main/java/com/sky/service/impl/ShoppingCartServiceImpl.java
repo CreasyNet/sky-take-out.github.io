@@ -5,12 +5,10 @@ import com.sky.dto.ShoppingCartDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
 import com.sky.entity.ShoppingCart;
-import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.mapper.ShoppingCartMapper;
 import com.sky.service.ShoppingCartService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,7 +40,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         shoppingCart.setUserId(id);
 
         //查询数据库是否有添加的菜品或者套餐信息--使用动态Sql
-        List<ShoppingCart> shoppingCarts = shoppingCartMapper.queryById(shoppingCart);
+        List<ShoppingCart> shoppingCarts = shoppingCartMapper.query(shoppingCart);
 
 
         if (shoppingCarts != null && shoppingCarts.size()>0){
@@ -73,5 +71,18 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         shoppingCart.setCreateTime(LocalDateTime.now());
 
         shoppingCartMapper.insert(shoppingCart);
+    }
+
+    /**
+     * 查看购物车
+     * @return
+     */
+    public List<ShoppingCart> showShoppingCart() {
+        Long id = BaseContext.getCurrentId();
+        ShoppingCart shoppingCart = ShoppingCart.builder()
+                .id(id)
+                .build();
+        List<ShoppingCart> shoppingCarts = shoppingCartMapper.query(shoppingCart);
+        return shoppingCarts;
     }
 }
