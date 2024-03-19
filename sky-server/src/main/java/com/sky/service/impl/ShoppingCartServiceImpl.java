@@ -85,4 +85,11 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         List<ShoppingCart> shoppingCarts = shoppingCartMapper.query(shoppingCart);
         return shoppingCarts;
     }
+
+    /**
+     * 清空购物车
+     */
+    public void delete() {
+        shoppingCartMapper.deleteAll();
+    }
 }
