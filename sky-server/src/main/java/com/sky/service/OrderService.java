@@ -19,4 +19,11 @@ public interface OrderService {
       * @return
       */
      PageResult listOrder(int page, int pageSize, Integer status);
+
+     /**
+      * 订单详情
+      * @param orderId
+      * @return
+      */
+     OrderVO orderDetail(Long orderId);
 }
