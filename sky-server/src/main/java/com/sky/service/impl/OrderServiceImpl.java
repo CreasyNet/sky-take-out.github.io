@@ -11,6 +11,7 @@ import com.sky.entity.OrderDetail;
 import com.sky.entity.Orders;
 import com.sky.entity.ShoppingCart;
 import com.sky.exception.AddressBookBusinessException;
+import com.sky.exception.OrderBusinessException;
 import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.OrderDetailMapper;
 import com.sky.mapper.OrderMapper;
@@ -151,5 +152,36 @@ public class OrderServiceImpl implements OrderService {
 
         orderVO.setOrderDetailList(orderDetails);
         return orderVO;
+    }
+
+    /**
+     * 取消订单
+     * @param orderId
+     */
+    public void orderCancel(Long orderId) {
+      /*  - 待支付和待接单状态下，用户可直接取消订单
+                - 商家已接单状态下，用户取消订单需电话沟通商家
+                - 派送中状态下，用户取消订单需电话沟通商家
+                - 如果在待接单状态下取消订单，需要给用户退款
+                - 取消订单后需要将订单状态修改为“已取消”*/
+        Orders order = orderMapper.getById(orderId);
+        Integer status = order.getStatus();
+
+        if (order == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        if (order.getStatus() > 2) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        if (order.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
+            //调用微信支付退款接口
+            //支付状态修改为 退款
+            order.setPayStatus(Orders.REFUND);
+        }
+        order.setStatus(Orders.CANCELLED);
+        order.setCancelReason("用户取消");
+        order.setCancelTime(LocalDateTime.now());
+        orderMapper.update(orderId);
+
     }
 }

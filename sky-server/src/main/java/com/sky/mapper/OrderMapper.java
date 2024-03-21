@@ -7,6 +7,7 @@ import com.sky.entity.User;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface OrderMapper {
@@ -30,4 +31,11 @@ public interface OrderMapper {
      */
     @Select("select * from orders where id = #{orderId}")
     Orders getById(Long orderId);
+
+    /**
+     * 设置取消订单
+     * @param orderId
+     */
+    @Update("update orders set status = 6 where id = #{orderId}")
+    void update(Long orderId);
 }
