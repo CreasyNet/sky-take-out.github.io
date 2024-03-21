@@ -32,4 +32,10 @@ public interface OrderService {
       * @param orderId
       */
      void orderCancel(Long orderId);
+     /**
+      * 再来一单
+      *
+      * @param id
+      */
+     void repetition(Long id);
 }
