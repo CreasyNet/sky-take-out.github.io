@@ -1,5 +1,6 @@
 package com.sky.service;
 
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.dto.UserLoginDTO;
 import com.sky.entity.User;
@@ -38,4 +39,11 @@ public interface OrderService {
       * @param id
       */
      void repetition(Long id);
+
+     /**
+      * 管理端订单搜索
+      * @param ordersPageQueryDTO
+      * @return
+      */
+     PageResult conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO);
 }

@@ -24,12 +24,9 @@ public class OrderController {
 
     @GetMapping("/conditionSearch")
     @ApiOperation("订单搜索")//分页查询
-
-    public Result<OrderSubmitVO> submit(OrdersPageQueryDTO ordersPageQueryDTO){
+    public Result<PageResult> submit(OrdersPageQueryDTO ordersPageQueryDTO){
         log.info("订单搜索,{}", ordersPageQueryDTO);
-
-//        PageResult orderService.conditionSearch(ordersPageQueryDTO);
-//        return Result.success(orderSubmitVO);
-        return null;
+        PageResult pageResult = orderService.conditionSearch(ordersPageQueryDTO);
+        return Result.success(pageResult);
     }
 }
