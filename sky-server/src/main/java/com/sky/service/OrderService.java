@@ -62,4 +62,10 @@ public interface OrderService {
       * @param ordersRejectionDTO
       */
      void rejectOrder(OrdersRejectionDTO ordersRejectionDTO);
+
+     /**
+      * 取消
+      * @param ordersCancelDTO
+      */
+     void cancel(OrdersCancelDTO ordersCancelDTO);
 }
