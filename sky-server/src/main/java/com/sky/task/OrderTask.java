@@ -21,7 +21,7 @@ public class OrderTask {
      * 处理支付超时订单
      */
     //@Scheduled(cron = "0 * * * * ?")
-    @Scheduled(cron = "0/5 * * * * ?")
+    //@Scheduled(cron = "0/5 * * * * ?")
     public void processTimeoutOrder(){
         log.info("处理支付超时订单：{}", new Date());
 
@@ -43,7 +43,7 @@ public class OrderTask {
      * 处理“派送中”状态的订单
      */
 //    @Scheduled(cron = "0 0 1 * * ?")
-    @Scheduled(cron = "1/5 * * * * *")
+    //@Scheduled(cron = "1/5 * * * * *")
     public void processDeliveryOrder(){
         log.info("处理派送中订单：{}", new Date());
 
