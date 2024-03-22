@@ -56,4 +56,10 @@ public interface OrderService {
       * @param
       */
      public void receiveOrder(OrdersConfirmDTO ordersConfirmDTO);
+
+     /**
+      * 拒单
+      * @param ordersRejectionDTO
+      */
+     void rejectOrder(OrdersRejectionDTO ordersRejectionDTO);
 }

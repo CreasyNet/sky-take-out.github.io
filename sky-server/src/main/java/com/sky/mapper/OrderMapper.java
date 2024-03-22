@@ -47,9 +47,8 @@ public interface OrderMapper {
     Integer countStatus(Integer status);
 
     /**
-     * 修改订单状态为已接单
+     * 修改订单状态
      * @param
      */
-    @Update("update orders set status = #{status} where id = #{id}")
     void updateOrder(Orders orders);
 }

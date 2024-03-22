@@ -5,10 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
-import com.sky.dto.OrdersConfirmDTO;
-import com.sky.dto.OrdersDTO;
-import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.dto.OrdersSubmitDTO;
+import com.sky.dto.*;
 import com.sky.entity.AddressBook;
 import com.sky.entity.OrderDetail;
 import com.sky.entity.Orders;
@@ -26,6 +23,7 @@ import com.sky.service.ShoppingCartService;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -298,5 +296,29 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.updateOrder(order);
     }
 
+    /**
+     * 拒绝接单
+     * @param ordersRejectionDTO
+     */
+    public void rejectOrder(OrdersRejectionDTO ordersRejectionDTO) {
+        /**
+         * - 商家拒单其实就是将订单状态修改为“已取消”
+         * - 只有订单处于“待接单”状态时可以执行拒单操作
+         * - 商家拒单时需要指定拒单原因
+         * - 商家拒单时，如果用户已经完成了支付，需要为用户退款
+         */
+        Orders order = orderMapper.getById(ordersRejectionDTO.getId());
+        if (order == null || !(order.getStatus().equals(Orders.TO_BE_CONFIRMED))){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
 
+
+        Orders orderNew = new Orders();
+        orderNew.setId(ordersRejectionDTO.getId());
+        orderNew.setRejectionReason(ordersRejectionDTO.getRejectionReason());
+        orderNew.setStatus(Orders.CANCELLED);
+        orderNew.setCancelTime(LocalDateTime.now());
+
+        orderMapper.updateOrder(orderNew);
+    }
 }

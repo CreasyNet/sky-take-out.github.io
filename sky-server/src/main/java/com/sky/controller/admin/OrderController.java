@@ -1,9 +1,6 @@
 package com.sky.controller.admin;
 
-import com.sky.dto.OrdersConfirmDTO;
-import com.sky.dto.OrdersDTO;
-import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.dto.OrdersSubmitDTO;
+import com.sky.dto.*;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.OrderService;
@@ -57,11 +54,24 @@ public class OrderController {
         return Result.success(orderVO);
     }
 
+    /**
+     * 商家接单
+     * @param ordersConfirmDTO
+     * @return
+     */
     @PutMapping("/confirm")
     @ApiOperation("接单")
     public Result receive(@RequestBody OrdersConfirmDTO ordersConfirmDTO){
         log.info("接单,{}",ordersConfirmDTO.getId());
         orderService.receiveOrder(ordersConfirmDTO);
+        return Result.success();
+    }
+
+    @PutMapping("/rejection")
+    @ApiOperation("拒单")
+    public Result  reject(@RequestBody OrdersRejectionDTO ordersRejectionDTO){
+        log.info("拒单,{}",ordersRejectionDTO.getId());
+        orderService.rejectOrder(ordersRejectionDTO);
         return Result.success();
     }
 }
