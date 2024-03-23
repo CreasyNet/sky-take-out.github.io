@@ -73,4 +73,12 @@ public interface OrderMapper {
 
 
     Double sumByMap(Map map);
+
+    /**
+     * 统计区间内每天的订单总数
+     * @param map
+     * @return
+     */
+    Integer countByDay(Map map);
+
 }
