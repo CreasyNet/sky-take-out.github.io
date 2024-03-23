@@ -15,6 +15,7 @@ import com.sky.service.ReportService;
 import com.sky.service.UserService;
 import com.sky.utils.HttpClientUtil;
 import com.sky.vo.TurnoverReportVO;
+import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -33,6 +35,9 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private OrderMapper orderMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * 开始到结束时间段内每天的营业额统计
@@ -70,4 +75,49 @@ public class ReportServiceImpl implements ReportService {
                 .turnoverList(StringUtils.join(totals,","))
                 .build();
     }
+
+    /**
+     * 指定区间内的用户数据统计
+     * @param begin
+     * @param end
+     * @return
+     */
+    public UserReportVO getUserStatistics(LocalDate begin, LocalDate end) {
+        //返回日期的列表(字符串)
+        ArrayList<LocalDate> localDates = new ArrayList<>();
+        localDates.add(begin);
+        while (!(begin.equals(end))){
+            begin = begin.plusDays(1);
+            localDates.add(begin);
+        }
+        //求区间内每天总的用户数
+        ArrayList<Long> totals = new ArrayList<>();
+        ArrayList<Long> newUsers = new ArrayList<>();
+
+        for (LocalDate localDate : localDates) {
+            LocalDateTime endTime = LocalDateTime.of(localDate, LocalTime.MAX);
+            LocalDateTime beginTime = LocalDateTime.of(localDate, LocalTime.MIN);
+            Map map2 = new HashMap<>();
+
+            map2.put("end",endTime);
+
+            Long total = userMapper.countByDay(map2);
+            totals.add(total);
+
+            map2.put("begin",beginTime);
+            Long newUser = userMapper.countByDay(map2);
+            newUsers.add(newUser);
+        }
+
+        //求每天新增用户数
+        return UserReportVO.builder()
+                .dateList(StringUtils.join(localDates,","))
+                .totalUserList(StringUtils.join(totals,","))
+                .newUserList(StringUtils.join(newUsers,","))
+                .build();
+
+
+    }
+
+
 }

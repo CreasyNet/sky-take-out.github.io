@@ -6,4 +6,27 @@
         insert into user (openid, name, phone, sex, id_number, avatar, create_time)
     VALUES (#{openid},#{name},#{phone},#{sex},#{idNumber},#{avatar},#{createTime})
     </insert>
+
+    <select id="countByDay" resultType="java.lang.Long">
+        select count(id) from user
+        <where>
+            <if test="begin != null">
+            and create_time &gt; #{begin}  /*如果是对象就是属性，如果是集合就是key名*/
+         </if>
+           <if test="end != null" >
+            and create_time &lt; #{end}
+           </if>
+        </where>
+    </select>
+    <select id="countByMap" resultType="java.lang.Integer">
+        select count(id) from user
+        <where>
+            <if test="begin != null">
+                and create_time &gt;= #{begin}
+            </if>
+            <if test="end != null">
+                and create_time &lt;= #{end}
+            </if>
+        </where>
+    </select>
 </mapper>
