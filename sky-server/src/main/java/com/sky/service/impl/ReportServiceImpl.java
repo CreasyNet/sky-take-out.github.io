@@ -16,17 +16,24 @@ import com.sky.properties.WeChatProperties;
 import com.sky.service.OrderService;
 import com.sky.service.ReportService;
 import com.sky.service.UserService;
+import com.sky.service.WorkspaceService;
 import com.sky.utils.HttpClientUtil;
-import com.sky.vo.OrderReportVO;
-import com.sky.vo.SalesTop10ReportVO;
-import com.sky.vo.TurnoverReportVO;
-import com.sky.vo.UserReportVO;
+import com.sky.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.NotWritablePropertyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -48,6 +55,9 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private OrderDetailMapper orderDetailMapper;
+
+    @Autowired
+    private WorkspaceService workspaceService;
 
     /**
      * 开始到结束时间段内每天的营业额统计
@@ -181,7 +191,7 @@ public class ReportServiceImpl implements ReportService {
             LocalDateTime beginTime = LocalDateTime.of(localDate, LocalTime.MIN);
 
             Integer total = orderMapper.countByDay(getMap(beginTime, endTime, null));
-            Integer validOrder = orderMapper.countByDay(getMap(beginTime, endTime,Orders.COMPLETED));
+            Integer validOrder = orderMapper.countByDay(getMap(beginTime, endTime, Orders.COMPLETED));
             totals.add(total);
             valids.add(validOrder);
         }
@@ -206,6 +216,7 @@ public class ReportServiceImpl implements ReportService {
 
     /**
      * 销量前10
+     *
      * @param begin
      * @param end
      * @return
@@ -220,7 +231,7 @@ public class ReportServiceImpl implements ReportService {
          */
         LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
         LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
-        List<GoodsSalesDTO> goodsSalesDTOS = orderDetailMapper.getSalesTop10(beginTime,endTime);
+        List<GoodsSalesDTO> goodsSalesDTOS = orderDetailMapper.getSalesTop10(beginTime, endTime);
         List<String> names = goodsSalesDTOS.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList());
         List<Integer> nums = goodsSalesDTOS.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
      /*   ArrayList<String> names = new ArrayList<>();
@@ -231,9 +242,75 @@ public class ReportServiceImpl implements ReportService {
         }*/
 
         return SalesTop10ReportVO.builder()
-                .nameList(StringUtils.join(names,","))
-                .numberList(StringUtils.join(nums,","))
+                .nameList(StringUtils.join(names, ","))
+                .numberList(StringUtils.join(nums, ","))
                 .build();
+    }
+
+    /**
+     * 导出运营数据
+     *
+     * @param httpServletResponse
+     */
+    public void exportBuisness(HttpServletResponse httpServletResponse) {
+        //查询数据
+        LocalDate begin = LocalDate.now().minusDays(30);
+        LocalDate end = LocalDate.now().minusDays(1);
+
+        LocalDateTime localDateTimeBegin = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime localDateTimeEnd = LocalDateTime.of(end, LocalTime.MAX);
+
+        BusinessDataVO businessData = workspaceService.getBusinessData(localDateTimeBegin, localDateTimeEnd);
+        //通过poi写入excle表格
+        try {
+            FileInputStream fileInputStream = new FileInputStream(new File("D:\\JavaWeb\\CangQiong\\workspace\\sky-take-out\\sky-server\\src\\main\\resources\\template\\运营数据报表模板.xlsx"));
+            XSSFWorkbook operationExcel = new XSSFWorkbook(fileInputStream);
+            XSSFSheet sheet1 = operationExcel.getSheetAt(0);
+            sheet1.getRow(1).getCell(1).setCellValue("时间：" + localDateTimeBegin + "-" + localDateTimeEnd);
+
+            XSSFRow row = sheet1.getRow(3);
+            row.getCell(2).setCellValue(businessData.getTurnover());
+            row.getCell(4).setCellValue(businessData.getOrderCompletionRate());
+            row.getCell(6).setCellValue(businessData.getNewUsers());
+
+            row = sheet1.getRow(4);
+            row.getCell(2).setCellValue(businessData.getValidOrderCount());
+            row.getCell(4).setCellValue(businessData.getUnitPrice());
+
+
+            //明细数据
+   /*     int lastRowNum = sheet1.getLastRowNum();
+
+        for (int i = 8; i <=lastRowNum ; i++) {
+            for (int j = 1; j < 7; j++) {
+                XSSFRow row = sheet1.getRow(i);
+                row.getCell(j).setCellValue();
+            }
+        }*/
+            for (int i = 0; i < 30; i++) {
+                begin = begin.plusDays(i);
+                LocalDateTime beginLocal = LocalDateTime.of(begin, LocalTime.MIN);
+                LocalDateTime endLocal = LocalDateTime.of(end, LocalTime.MAX);
+                BusinessDataVO businessData1 = workspaceService.getBusinessData(beginLocal, endLocal);
+
+                 row = sheet1.getRow(7 + i);
+                 row.getCell(1).setCellValue(begin.toString());
+                 row.getCell(2).setCellValue(businessData1.getTurnover());
+                 row.getCell(3).setCellValue(businessData1.getValidOrderCount());
+                 row.getCell(4).setCellValue(businessData1.getOrderCompletionRate());
+                 row.getCell(5).setCellValue(businessData1.getUnitPrice());
+                 row.getCell(6).setCellValue(businessData1.getNewUsers());
+            }
+
+            //输出流下载到客户端
+            ServletOutputStream outputStream = httpServletResponse.getOutputStream();
+            operationExcel.write(outputStream);
+
+            outputStream.close();
+            operationExcel.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Map getMap(LocalDateTime begin, LocalDateTime end, Integer status) {
